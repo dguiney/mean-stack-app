@@ -147,6 +147,7 @@ module.exports.reviewsUpdateOne = function(req, res) {
 		.findById(hotelId)
 		.select('reviews')
 		.exec(function(err, doc){
+			var thisReview
 			var response = {
 				status : 200,
 				message : doc
@@ -163,9 +164,9 @@ module.exports.reviewsUpdateOne = function(req, res) {
 				};
 			} else {
 				// Get the review
-				response.message = doc.reviews.id(reviewId);
+				thisReview = doc.reviews.id(reviewId);
 				// If the review doesn't exist Mongoose returns null
-				if (!response.message) {
+				if (!thisReview) {
 					response.status = 404;
 					response.message = {
 						"message" : "Review ID not found " + reviewId
@@ -180,9 +181,9 @@ module.exports.reviewsUpdateOne = function(req, res) {
 					.json(response.message);				
 			}
 			else{
-				doc.reviews.id(reviewId).name = req.body.name;
-				doc.reviews.id(reviewId).rating = parseInt(req.body.rating, 10);
-				doc.reviews.id(reviewId).review = req.body.review;
+				thisReview.name = req.body.name;
+				thisReview.rating = parseInt(req.body.rating, 10);
+				thisReview.review = req.body.review;
 
 				doc.save(function(err, reviewUpdated){
 					if(err){
@@ -201,7 +202,66 @@ module.exports.reviewsUpdateOne = function(req, res) {
 }
 
 
+module.exports.reviewsDeleteOne = function(req, res){
+	var hotelId = req.params.hotelId;
+	var reviewId = req.params.reviewId;
+	console.log("Get reviewId " + reviewId + " for hotelId ", hotelId);
 
+	Hotel
+		.findById(hotelId)
+		.select('reviews')
+		.exec(function(err, doc){
+			var thisReview;
+			var response = {
+				status : 200,
+				message : doc
+			}
+			if (err) {
+				console.log("Error finding hotel");
+				response.status = 500;
+				response.message = err;
+			} else if(!doc) {
+				console.log("Hotel id not found in database", id);
+				response.status = 404;
+				response.message = {
+					"message" : "Hotel ID not found " + id
+				};
+			} else {
+				// Get the review
+				thisReview = doc.reviews.id(reviewId);
+				// If the review doesn't exist Mongoose returns null
+				if (!thisReview) {
+					response.status = 404;
+					response.message = {
+						"message" : "Review ID not found " + reviewId
+					};
+				}
+			}
+
+			if (response.status !== 200)
+			{
+				res
+					.status(response.status)
+					.json(response.message);				
+			}
+			else{
+				doc.reviews.id(reviewId).remove();
+
+				doc.save(function(err, reviewUpdated){
+					if(err){
+						res 
+							.status(500)
+							.json(err);
+					}
+					else{
+						res 
+							.status(204)
+							.json();
+					}
+				})				
+			}
+		})
+}
 
 
 
