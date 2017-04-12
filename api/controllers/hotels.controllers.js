@@ -47,8 +47,8 @@ var runGeoQuery = function(req, res){
 module.exports.hotelsGetAll = function(req, res){
 	
 	var offset = 0;
-	var count = 5;
-	var maxCount = 10;
+	var count = 19;
+	var maxCount = 20;
 
 	if(req.query && req.query.lat && req.query.lng){
 		runGeoQuery(req, res);
@@ -171,3 +171,79 @@ module.exports.hotelsAddOne = function(req, res){
 			}
 		});
 };
+
+module.exports.hotelsUpdateOne = function(req, res) {
+	var hotelId = req.params.hotelId;
+	
+	Hotel
+		.findById(hotelId)
+		.select("-reviews -rooms")
+		.exec(function(err, doc){
+			var response = {
+				status : 200,
+				message : doc
+			};
+
+			if(err) {
+				console.log("Error finding Hotel");
+				response.status = 500;
+				response.message = err;
+			} else if (!doc){
+				response.status = 404;
+				response.message = {
+					"messgae" : "Hotel ID not found"	
+				};
+			}
+
+			if(response.status !== 200){
+				res
+					.status(response.status)
+					.json(response.message);
+			}
+			else{
+				doc.name = req.body.name;
+				doc.description = req.body.description;
+				doc.stars = parseInt(req.body.stars, 10);
+				doc.services = _splitArray(req.body.services);
+				doc.photos = _splitArray(req.body.photos);
+				doc.currency = req.body.currency;
+				doc.location = {
+					address : req.body.address,
+					coordinates : [
+						parseFloat(req.body.lng), 
+						parseFloat(req.body.lat)
+					]
+				};
+
+				doc.save(function(err, hotelUpdated){
+					if(err){
+						res
+							.status(500)
+							.json(err);
+					}
+					else {
+						res 
+							.status(204)
+							.json();
+					}
+				});
+
+			}			
+		});
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
