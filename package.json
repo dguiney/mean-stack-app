@@ -1,0 +1,32 @@
+{
+  "name": "mean-app",
+  "version": "1.0.0",
+  "description": "MEAN stack application",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodejs app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dguiney/mean-stack-app.git"
+  },
+  "keywords": [
+    "mean"
+  ],
+  "author": "David Guiney",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dguiney/mean-stack-app/issues"
+  },
+  "homepage": "https://github.com/dguiney/mean-stack-app#readme",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "mongodb": "^2.2.25",
+    "mongoose": "^4.9.3"
+  },
+  "devDependencies": {
+    "mocha": "^3.2.0"
+  }
+}
